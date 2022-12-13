@@ -23,27 +23,35 @@ galleryEl.innerHTML = galleryStr;
 
 galleryEl.addEventListener("click", openModal);
 
+const instance = basicLightbox.create(
+  `
+    <img src="" width="1280" height="853">
+`,
+  {
+    onShow: (instance) => {
+      document.addEventListener("keydown", onEscClick);
+    },
+    onClose: (instance) => {
+      document.removeEventListener("keydown", onEscClick);
+    },
+  }
+);
+
 function openModal(evt) {
   evt.preventDefault();
 
   if (evt.target.nodeName !== "IMG") {
     return;
   }
-  const getUrlLargeImg = evt.target.dataset.source;
 
-  const instance = basicLightbox.create(`
-    <img src=${getUrlLargeImg} width="1280" height="853">
-`);
+  instance.element().querySelector("img").src = evt.target.dataset.source;
 
   instance.show();
+}
 
-  const basicLightboxEl = document.querySelector(".basicLightbox");
-
-  if (basicLightboxEl) {
-    document.addEventListener("keydown", (evt) => {
-      if (evt.code === "Escape") {
-        instance.close();
-      }
-    });
+function onEscClick(evt) {
+  if (evt.code === "Escape") {
+    instance.close();
+    return;
   }
 }
